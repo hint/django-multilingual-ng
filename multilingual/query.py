@@ -514,6 +514,7 @@ class MultilingualModelQuerySet(QuerySet):
         query = query or MultilingualQuery(model)
         super(MultilingualModelQuerySet, self).__init__(model, query, using)
         self._field_name_cache = None
+        self._default_language = get_default_language()
         
     def __deepcopy__(self, memo):
         """
