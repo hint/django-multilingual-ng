@@ -2,6 +2,7 @@ from django.db import models
 
 from multilingual.query import MultilingualModelQuerySet
 from multilingual.languages import *
+from multilingual.utils import get_multilingual_ordering
 
 
 class MultilingualManager(models.Manager):
@@ -14,5 +15,12 @@ class MultilingualManager(models.Manager):
     """
 
     def get_query_set(self):
-        return MultilingualModelQuerySet(self.model)
+        """
+        Applies ordering by a translated field to the queryset
+        """
+        qs = MultilingualModelQuerySet(self.model)
+        ordering = get_multilingual_ordering(self.model)
+        if ordering:
+            return qs.order_by(ordering)
+        return qs
 Manager = MultilingualManager # backwards compat, will be depricated

@@ -19,7 +19,7 @@ from django.utils.translation import ugettext as _
 from django.template.loader import find_template
 from django.template import TemplateDoesNotExist
 from multilingual.languages import get_default_language
-from multilingual.utils import GLL
+from multilingual.utils import GLL, get_multilingual_ordering
 
 MULTILINGUAL_PREFIX = '_ml__trans_'
 MULTILINGUAL_INLINE_PREFIX = '_ml__inline_trans_'
@@ -149,7 +149,7 @@ class MultilingualInlineAdmin(admin.TabularInline):
         if hasattr(self, 'use_fields'):
             # go around admin fields structure validation
             self.fields = self.use_fields
-        
+    @gll
     def get_formset(self, request, obj=None, **kwargs):
         FormSet = super(MultilingualInlineAdmin, self).get_formset(request, obj, **kwargs)
         FormSet.use_language = GLL.language_code
@@ -160,6 +160,7 @@ class MultilingualInlineAdmin(admin.TabularInline):
             FormSet.ml_fields[name] = fieldname
         return FormSet
 
+    @gll
     def queryset(self, request):
         """
         Filter objects which don't have a value in this language
@@ -332,7 +333,18 @@ class MultilingualModelAdmin(admin.ModelAdmin):
     @gll
     def delete_view(self, *args, **kwargs):
         return super(MultilingualModelAdmin, self).delete_view(*args, **kwargs)
-    
+
+    @gll
+    def changelist_view(self, *args, **kwargs):
+        """
+        Sets modelAdmin ordering to the value obtained from Translation.Meta
+        """
+        if not self.ordering:
+            ordering = get_multilingual_ordering(self.model)
+            if ordering:
+                self.ordering = (ordering,)
+        return super(MultilingualModelAdmin, self).changelist_view(*args, **kwargs)
+
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         # add context variables
         filled_languages = []

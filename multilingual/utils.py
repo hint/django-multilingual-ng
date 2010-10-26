@@ -17,6 +17,15 @@ def is_multilingual_model(model):
     """
     return hasattr(model._meta, 'translation_model')
 
+def get_multilingual_ordering(model):
+    """
+    Returns the first item in 'ordering' attribute in Translation meta class
+    """
+    if is_multilingual_model(model):
+        translation_opts = model._meta.translation_model._meta
+        if translation_opts.ordering and translation_opts.ordering[0] != 'language_code':
+            return translation_opts.ordering[0]
+    return ''
 
 def _get_language_code():
     return getattr(_thread_locals, 'gll_language_code', None)

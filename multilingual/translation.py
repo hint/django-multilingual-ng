@@ -308,8 +308,10 @@ class TranslationModel(object):
             meta = cls.Meta
         except AttributeError:
             meta = TransMeta
+        
+        if not getattr(meta, 'ordering', None):
+            meta.ordering = ('language_code',)
 
-        meta.ordering = ('language_code',)
         meta.unique_together = tuple(unique)
         meta.app_label = main_cls._meta.app_label
         if not hasattr(meta, 'db_table'):
