@@ -12,3 +12,5 @@ tests/.installed.cfg
 tests/testproject.db
 tests/downloads
 testproject.db
+_env
+.settings

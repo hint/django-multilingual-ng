@@ -1,0 +1,53 @@
+[
+	{
+		"pk": 1,
+		"model": "testproject.multimodel", 
+		"fields": {
+			"field1": "Abc"
+		}
+	},
+	{
+		"pk": 1,
+		"model": "testproject.multimodeltranslation",
+		"fields": {
+			"field2": "Zyx",
+			"field3": 1,
+			"language_code": "en",
+			"master": 1
+		}
+	},
+	{
+		"pk": 2,
+		"model": "testproject.multimodel", 
+		"fields": {
+			"field1": "Def"
+		}
+	},
+	{
+		"pk": 2,
+		"model": "testproject.multimodeltranslation",
+		"fields": {
+			"field2": "Wut",
+			"field3": 2,
+			"language_code": "en",
+			"master": 2
+		}
+	},
+	{
+		"pk": 3,
+		"model": "testproject.multimodel", 
+		"fields": {
+			"field1": "Ghi"
+		}
+	},
+	{
+		"pk": 3,
+		"model": "testproject.multimodeltranslation",
+		"fields": {
+			"field2": "Srt",
+			"field3": 3,
+			"language_code": "en",
+			"master": 3
+		}
+	}
+]

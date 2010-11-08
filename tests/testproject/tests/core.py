@@ -3,6 +3,8 @@ from multilingual.flatpages.models import MultilingualFlatPage
 from multilingual.utils import GLL
 from multilingual import languages
 from django.utils.translation import activate
+from testproject.models import MultiModel
+
 
 class CoreTestCase(TestCase):
     fixtures = ['testdata.json']
@@ -60,3 +62,12 @@ class CoreTestCase(TestCase):
         activate('en')
         self.assertEqual(mfp.title_current, None)
         self.assertEqual(mfp.title_current_any, mfp.title_ja)
+        
+    def test_09_ordering_low_level(self):
+        activate('en')
+        mms = MultiModel.objects.all()
+        self.assertEqual(mms[0].pk, 3)
+        self.assertEqual(mms[2].pk, 1)
+        mms = MultiModel.objects.order_by('field1')
+        self.assertEqual(mms[0].pk, 1)
+        self.assertEqual(mms[2].pk, 3)

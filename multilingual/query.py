@@ -20,6 +20,7 @@ from django.db.models.sql.datastructures import (
     MultiJoin)
 from django.db.models.sql.constants import *
 from django.db.models.sql.where import WhereNode, EverythingNode, AND, OR
+from django.utils.translation import get_language
 
 try:
     # handle internal API changes in Django rev. 9700
@@ -572,7 +573,7 @@ class MultilingualModelQuerySet(QuerySet):
                 if field_and_lang:
                     field, language_code = field_and_lang
                     if language_code is None:
-                        language_code = getattr(self, '_default_language', None)
+                        language_code = get_language() or getattr(self, '_default_language', None)
                     real_name = get_translated_field_alias(field.attname,
                                                            language_code)
                     new_field_names.append(prefix + real_name)
