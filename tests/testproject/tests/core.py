@@ -1,7 +1,9 @@
 from django.test import TestCase
+from django.test.client import Client
 from multilingual.flatpages.models import MultilingualFlatPage
 from multilingual.utils import GLL
 from multilingual import languages
+from django.contrib.auth.models import User
 from django.utils.translation import activate
 from testproject.models import MultiModel
 
@@ -42,6 +44,7 @@ class CoreTestCase(TestCase):
         self.assertEqual(languages.get_default_language(), 'en')
         languages.set_default_language('ja')
         self.assertEqual(languages.get_default_language(), 'ja')
+        languages.set_default_language('en')
         
     def test_06_get_fallbacks(self):
         self.assertEqual(languages.get_fallbacks('en'), ['en', 'ja'])
@@ -64,6 +67,7 @@ class CoreTestCase(TestCase):
         self.assertEqual(mfp.title_current_any, mfp.title_ja)
         
     def test_09_ordering_low_level(self):
+        """Test ordering works in ORM"""
         activate('en')
         mms = MultiModel.objects.all()
         self.assertEqual(mms[0].pk, 3)
@@ -71,3 +75,15 @@ class CoreTestCase(TestCase):
         mms = MultiModel.objects.order_by('field1')
         self.assertEqual(mms[0].pk, 1)
         self.assertEqual(mms[2].pk, 3)
+        
+    def test_10_ordering_admin(self):
+        """Test ordering in admin"""
+        username = 'testuser'
+        password = 'testpassword'
+        email = 'test@example.org'
+        User.objects.create_superuser(username, email, password)
+        c = Client()
+        self.assertEqual(c.login(username=username, password=password), True)
+        r = c.get('/admin/testproject/multimodel/')
+        self.assertEqual(r.context['cl'].get_query_set()[0].pk, 2)
+        self.assertEqual(r.context['cl'].get_query_set()[2].pk, 1)

@@ -1,5 +1,5 @@
 
-from django.conf.urls.defaults import patterns, include, handler500
+from django.conf.urls.defaults import *
 from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
@@ -9,7 +9,7 @@ handler404 = 'django.views.defaults.page_not_found'
 
 urlpatterns = patterns(
     '',
-    (r'^admin/(.*)', admin.site.root),
+    url(r'^admin/', include(admin.site.urls)),
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 )
 
