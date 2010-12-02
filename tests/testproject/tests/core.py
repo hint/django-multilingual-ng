@@ -1,3 +1,5 @@
+from tests.testproject.models import MultiInlineModel
+from tests.testproject.models import MultiModel2
 from django.test import TestCase
 from django.test.client import Client
 from multilingual.flatpages.models import MultilingualFlatPage
@@ -5,7 +7,7 @@ from multilingual.utils import GLL
 from multilingual import languages
 from django.contrib.auth.models import User
 from django.utils.translation import activate
-from testproject.models import MultiModel
+from testproject.models import MultiModel, MultiModel2, MultiInlineModel
 
 
 class CoreTestCase(TestCase):
@@ -85,5 +87,39 @@ class CoreTestCase(TestCase):
         c = Client()
         self.assertEqual(c.login(username=username, password=password), True)
         r = c.get('/admin/testproject/multimodel/')
+        self.assertEqual(r.status_code, 200)
         self.assertEqual(r.context['cl'].get_query_set()[0].pk, 2)
         self.assertEqual(r.context['cl'].get_query_set()[2].pk, 1)
+
+    def test_11_inline_admin(self):
+        """Test admin with inlines"""
+        username = 'testuser1'
+        password = 'testpassword1'
+        email = 'test1@example.org'
+        User.objects.create_superuser(username, email, password)
+        c = Client()
+        self.assertEqual(c.login(username=username, password=password), True)
+        r = c.get('/admin/testproject/multimodel2/1/')
+        self.assertEquals(r.status_code, 200)
+
+        en_field = "relation_en"
+        mm = MultiModel2.objects.create(field1="abcd", field2="default language")
+        GLL.lock('en')
+        mm.field2 = "en"
+        mm.multiinlinemodel_set.create(field1=en_field)
+        mm.save()
+        GLL.release()
+
+        jp_field = "relation_jp"
+        GLL.lock('jp')
+        mm.field2 = "jp"
+        mm.multiinlinemodel_set.create(field1=jp_field)
+        mm.save()
+        GLL.release()
+
+        r = c.get('/admin/testproject/multimodel2/%d/' % mm.pk, {"language":"en"})
+        self.assertEquals(r.status_code, 200)
+        self.assertTrue('value="%s"'%en_field in r.content)
+        self.assertFalse('value="%s"'%jp_field in r.content)
+
+

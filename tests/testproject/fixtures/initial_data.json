@@ -35,7 +35,7 @@
 	},
 	{
 		"pk": 3,
-		"model": "testproject.multimodel", 
+		"model": "testproject.multimodel",
 		"fields": {
 			"field1": "Ghi"
 		}
@@ -49,5 +49,38 @@
 			"language_code": "en",
 			"master": 3
 		}
-	}
+	},
+	{
+		"pk": 1,
+		"model": "testproject.multimodel2",
+		"fields": {
+			"field1": "Ghi"
+		}
+	},
+	{
+		"pk": 1,
+		"model": "testproject.multimodel2translation",
+		"fields": {
+			"field2": "Srt",
+			"language_code": "en",
+			"master": 1
+		}
+	},
+        {
+            "pk": 1,
+            "model": "testproject.multiinlinemodel",
+            "fields":{
+                "ref1": 1
+            }
+        },
+        {
+            "pk": 1,
+            "model": "testproject.multiinlinemodeltranslation",
+            "fields":{
+                "field1": "asdf",
+                "language_code": "en",
+                "master": 1
+            }
+        }
+
 ]

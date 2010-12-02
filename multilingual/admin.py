@@ -149,7 +149,7 @@ class MultilingualInlineAdmin(admin.TabularInline):
         if hasattr(self, 'use_fields'):
             # go around admin fields structure validation
             self.fields = self.use_fields
-    @gll
+    #@gll
     def get_formset(self, request, obj=None, **kwargs):
         FormSet = super(MultilingualInlineAdmin, self).get_formset(request, obj, **kwargs)
         FormSet.use_language = GLL.language_code
@@ -160,7 +160,7 @@ class MultilingualInlineAdmin(admin.TabularInline):
             FormSet.ml_fields[name] = fieldname
         return FormSet
 
-    @gll
+    #@gll
     def queryset(self, request):
         """
         Filter objects which don't have a value in this language

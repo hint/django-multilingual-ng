@@ -43,6 +43,8 @@ class GlobalLanguageLock(object):
     a specific language and not try to fall back.
     """
     def lock(self, language_code):
+        if _get_language_code():
+            raise GLLError("The Global Language Lock is already active")
         _set_language_code(language_code)
         
     def release(self):
