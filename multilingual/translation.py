@@ -104,13 +104,10 @@ class TranslatedFieldProxy(property):
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
-
         return getattr(obj, 'get_' + self.field_name)(self.language_code,
                                                       self.fallback)
 
     def __set__(self, obj, value):
-        language_code = self.language_code
-
         return getattr(obj, 'set_' + self.field_name)(value, self.language_code)
 
     short_description = property(lambda self: self.field.short_description)
