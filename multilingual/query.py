@@ -12,7 +12,7 @@ from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models.fields import FieldDoesNotExist
 from django.db.models.query import QuerySet, Q
-from django.db.models.sql.query import Query
+from django.db.models.sql.query import get_proxied_model, Query
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models.sql.datastructures import (
     EmptyResultSet,
@@ -52,13 +52,14 @@ class MultilingualQuery(Query):
         extra_select = {}
         super(MultilingualQuery, self).__init__(model, where=where)
         opts = self.model._meta
-        qn = self.get_compiler(DEFAULT_DB_ALIAS).quote_name_unless_alias
         qn2 = self.get_compiler(DEFAULT_DB_ALIAS).connection.ops.quote_name
-        master_table_name = opts.db_table
-        translation_opts = opts.translation_model._meta
+        if not opts.proxy:
+            translation_opts = opts.translation_model._meta
+        else:
+            translation_opts = get_proxied_model(model._meta)._meta.translation_model._meta
+            opts = get_proxied_model(model._meta)._meta
         trans_table_name = translation_opts.db_table
         if hasattr(opts, 'translation_model'):
-            master_table_name = opts.db_table
             for language_code in get_language_code_list():
                 for fname in [f.attname for f in translation_opts.fields]:
                     table_alias = get_translation_table_alias(trans_table_name,
@@ -266,10 +267,10 @@ class MultilingualQuery(Query):
         exclusions = set()
         extra_filters = []
         for pos, name in enumerate(names):
-            try:
-                exclusions.add(int_alias)
-            except NameError:
-                pass
+            #try:
+            #    exclusions.add(int_alias)
+            #except NameError:
+            #    pass
             exclusions.add(alias)
             last.append(len(joins))
             if name == 'pk':

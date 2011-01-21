@@ -7,12 +7,11 @@ This file contains the implementation for QSRF Django.
 Huge thanks to hubscher.remy for writing this!
 """
 from django.db.models.sql.compiler import SQLCompiler
+from django.db.models.sql.query import get_proxied_model
 
 from multilingual.languages import (
     get_translation_table_alias,
-    get_language_code_list,
-    get_default_language,
-    get_translated_field_alias)
+    get_language_code_list)
 
 __ALL__ = ['MultilingualSQLCompiler']
 
@@ -23,11 +22,15 @@ class MultilingualSQLCompiler(SQLCompiler):
         Adds the JOINS and SELECTS for fetching multilingual data.
         """
         super(MultilingualSQLCompiler, self).pre_sql_setup()
-
+        
         if not self.query.include_translation_data:
             return
-
-        opts = self.query.model._meta
+        
+        if not self.query.model._meta.proxy:
+            opts = self.query.model._meta 
+        else:
+            opts = get_proxied_model(self.query.model._meta)._meta
+        
         qn = self.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
 
@@ -47,7 +50,6 @@ class MultilingualSQLCompiler(SQLCompiler):
                            qn2(table_alias),
                            language_code))
                 self.query.extra_join[table_alias] = trans_join
-
     
     def get_from_clause(self):
         """
