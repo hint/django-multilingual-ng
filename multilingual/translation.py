@@ -55,7 +55,8 @@ def fill_translation_cache(instance):
 
     for language_code in get_language_code_list():
         # see if translation for language_code was in the query
-        field_alias = get_translated_field_alias('code', language_code)
+        field_alias = get_translated_field_alias('language_code', language_code)
+
         if getattr(instance, field_alias, None) is not None:
             field_names = [f.attname for f in instance._meta.translation_model._meta.fields]
 
